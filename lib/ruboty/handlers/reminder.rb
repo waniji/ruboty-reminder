@@ -48,7 +48,7 @@ module Ruboty
       def list(message)
         body =
           if tasks.empty?
-            'No task registered.'
+            "The task doesn't exist."
           else
             tasks.map do |id, hash|
               "#{id}: #{hash[:hour]}:#{hash[:min]} -> #{hash[:body]}"
