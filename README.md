@@ -14,5 +14,7 @@ gem 'ruboty-reminder'
 
 ```
 # e.g. @ruboty remind 07:00 Hi,kaihara!
-@ruboty remind HH:MM <task>
+@ruboty add task HH:MM <task>
+@ruboty delete task <id>
+@ruboty list tasks <id>
 ```
