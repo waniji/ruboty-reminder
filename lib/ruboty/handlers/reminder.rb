@@ -13,12 +13,21 @@ module Ruboty
       end
 
       def add(message)
+        hour = message[:hh].to_i
+        min = message[:mm].to_i
+
+        # Validate
+        unless hour >= 0 && hour <= 23 && min >= 0 && min <= 59
+          message.reply('Invalid time format.')
+          return
+        end
+
         task = Ruboty::Reminder::Task.new(
           message.original.except(:robot).merge(
             id: generate_id,
             body: message[:task],
-            hour: message[:hh].to_i,
-            min: message[:mm].to_i
+            hour: hour,
+            min: min
           )
         )
         task.start(robot)
