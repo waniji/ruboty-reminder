@@ -3,14 +3,16 @@ module Ruboty
     class Reminder < Base
       NAMESPACE = 'reminder'
 
-      on /remind (?<hh>\d{2}):(?<mm>\d{2}) (?<task>.+)/, name: 'remind', description: 'Remind a task'
+      on /add task (?<hh>\d{2}):(?<mm>\d{2}) (?<task>.+)/, name: 'add', description: 'Add a task'
+      on /delete task (?<id>.+)/, name: 'delete', description: 'Delete a task'
+      on /list tasks/, name: 'list', description: 'Show all reminders'
 
       def initialize(*args)
         super
         restart
       end
 
-      def remind(message)
+      def add(message)
         task = Ruboty::Reminder::Task.new(
           message.original.except(:robot).merge(
             id: generate_id,
@@ -24,6 +26,27 @@ module Ruboty
 
         # Insert to the brain
         tasks[task.hash[:id]] = task.hash
+      end
+
+      def delete(message)
+        if tasks.delete(message[:id].to_i)
+          message.reply('Deleted.')
+        else
+          message.reply('Not found.')
+        end
+      end
+
+      def list(message)
+        body =
+          if tasks.empty?
+            'No task registered.'
+          else
+            tasks.map do |id, hash|
+              "#{id}: #{hash[:hour]}:#{hash[:min]} -> #{hash[:body]}"
+            end.join("\n")
+          end
+
+        message.reply(body)
       end
 
       def restart
