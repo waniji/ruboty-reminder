@@ -13,8 +13,14 @@ gem 'ruboty-reminder'
 ## Usage
 
 ```
-# e.g. @ruboty remind 07:00 Hi,kaihara!
 @ruboty add task HH:MM <task>
 @ruboty delete task <id>
 @ruboty list tasks <id>
+```
+
+## Example
+
+```
+> @ruboty add task 07:00 Hi,kaihara!
+Task 270 created.
 ```
