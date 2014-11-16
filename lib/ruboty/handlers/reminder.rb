@@ -51,7 +51,7 @@ module Ruboty
             "The task doesn't exist."
           else
             tasks.map do |id, hash|
-              "#{id}: #{hash[:hour]}:#{hash[:min]} -> #{hash[:body]}"
+              "#{id}: #{'%02d' % hash[:hour]}:#{'%02d' % hash[:min]} -> #{hash[:body]}"
             end.join("\n")
           end
 
