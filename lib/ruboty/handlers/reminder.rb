@@ -5,7 +5,7 @@ module Ruboty
 
       on /add task (?<hh>\d{2}):(?<mm>\d{2}) (?<task>.+)/, name: 'add', description: 'Add a task'
       on /delete task (?<id>.+)/, name: 'delete', description: 'Delete a task'
-      on /list tasks/, name: 'list', description: 'Show all reminders'
+      on /list tasks\z/, name: 'list', description: 'Show all reminders'
 
       def initialize(*args)
         super
