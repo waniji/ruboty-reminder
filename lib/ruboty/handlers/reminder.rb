@@ -31,7 +31,7 @@ module Ruboty
           )
         )
         task.start(robot)
-        message.reply("Task #{task.hash[:id]} created.")
+        message.reply("Task #{task.hash[:id]} is created.")
 
         # Insert to the brain
         tasks[task.hash[:id]] = task.hash
@@ -39,9 +39,9 @@ module Ruboty
 
       def delete(message)
         if tasks.delete(message[:id].to_i)
-          message.reply('Deleted.')
+          message.reply("Task #{message[:id]} is deleted.")
         else
-          message.reply('Not found.')
+          message.reply("Task #{message[:id]} is not found.")
         end
       end
 

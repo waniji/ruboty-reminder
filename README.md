@@ -22,5 +22,6 @@ gem 'ruboty-reminder'
 
 ```
 > @ruboty add task 07:00 Hi,kaihara!
-Task 270 created.
+Task 270 is created.
+Hi, kaihara!
 ```
