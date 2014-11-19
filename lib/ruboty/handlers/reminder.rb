@@ -46,16 +46,14 @@ module Ruboty
       end
 
       def list(message)
-        body =
-          if tasks.empty?
-            "The task doesn't exist."
-          else
-            tasks.map do |id, hash|
-              "#{id}: #{'%02d' % hash[:hour]}:#{'%02d' % hash[:min]} -> #{hash[:body]}"
-            end.join("\n")
-          end
-
-        message.reply(body)
+        if tasks.empty?
+          message.reply("The task doesn't exist.")
+        else
+          task_list = tasks.map do |id, hash|
+            "#{id}: #{'%02d' % hash[:hour]}:#{'%02d' % hash[:min]} -> #{hash[:body]}"
+          end.join("\n")
+          message.reply(task_list, code: true)
+        end
       end
 
       def restart
