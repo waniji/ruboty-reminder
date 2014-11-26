@@ -13,15 +13,15 @@ gem 'ruboty-reminder'
 ## Usage
 
 ```
-@ruboty add task HH:MM <task>
-@ruboty delete task <id>
-@ruboty list tasks <id>
+@ruboty add reminder HH:MM <task>
+@ruboty delete reminder <id>
+@ruboty list reminders <id>
 ```
 
 ## Example
 
 ```
-> @ruboty add task 07:00 Hi,kaihara!
-Task 270 is created.
+> @ruboty add reminder 07:00 Hi,kaihara!
+Reminder 270 is created.
 Hi, kaihara!
 ```

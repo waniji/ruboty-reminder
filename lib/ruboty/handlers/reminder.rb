@@ -3,9 +3,9 @@ module Ruboty
     class Reminder < Base
       NAMESPACE = 'reminder'
 
-      on /add task (?<hh>\d{2}):(?<mm>\d{2}) (?<task>.+)/, name: 'add', description: 'Add a task'
-      on /delete task (?<id>.+)/, name: 'delete', description: 'Delete a task'
-      on /list tasks\z/, name: 'list', description: 'Show all reminders'
+      on /add reminder (?<hh>\d{2}):(?<mm>\d{2}) (?<reminder>.+)/, name: 'add', description: 'Add a reminder'
+      on /delete reminder (?<id>.+)/, name: 'delete', description: 'Delete a reminder'
+      on /list reminders\z/, name: 'list', description: 'Show all reminders'
 
       def initialize(*args)
         super
@@ -25,52 +25,52 @@ module Ruboty
         task = Ruboty::Reminder::Task.new(
           message.original.except(:robot).merge(
             id: generate_id,
-            body: message[:task],
+            body: message[:reminder],
             hour: hour,
             min: min
           )
         )
         task.start(robot)
-        message.reply("Task #{task.hash[:id]} is created.")
+        message.reply("Reminder #{task.hash[:id]} is created.")
 
         # Insert to the brain
-        tasks[task.hash[:id]] = task.hash
+        reminders[task.hash[:id]] = task.hash
       end
 
       def delete(message)
-        if tasks.delete(message[:id].to_i)
-          message.reply("Task #{message[:id]} is deleted.")
+        if reminders.delete(message[:id].to_i)
+          message.reply("Reminder #{message[:id]} is deleted.")
         else
-          message.reply("Task #{message[:id]} is not found.")
+          message.reply("Reminder #{message[:id]} is not found.")
         end
       end
 
       def list(message)
-        if tasks.empty?
-          message.reply("The task doesn't exist.")
+        if reminders.empty?
+          message.reply("The reminder doesn't exist.")
         else
-          task_list = tasks.map do |id, hash|
+          reminder_list = reminders.map do |id, hash|
             "#{id}: #{'%02d' % hash[:hour]}:#{'%02d' % hash[:min]} -> #{hash[:body]}"
           end.join("\n")
-          message.reply(task_list, code: true)
+          message.reply(reminder_list, code: true)
         end
       end
 
       def restart
-        tasks.each do |id, hash|
+        reminders.each do |id, hash|
           task = Ruboty::Reminder::Task.new(hash)
           task.start(robot)
         end
       end
 
-      def tasks
+      def reminders
         robot.brain.data[NAMESPACE] ||= {}
       end
 
       def generate_id
         loop do
           id = rand(1000)
-          return id unless tasks.has_key?(id)
+          return id unless reminders.has_key?(id)
         end
       end
     end
