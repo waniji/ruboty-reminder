@@ -1,8 +1,6 @@
 module Ruboty
   module Reminder
     class Task
-      NAMESPACE = 'reminder'
-
       attr_reader :hash
 
       def initialize(hash)

@@ -1,7 +1,6 @@
 module Ruboty
   module Handlers
     class Reminder < Base
-      NAMESPACE = 'reminder'
 
       on /add reminder (?<hh>\d{2}):(?<mm>\d{2}) (?<reminder>.+)/, name: 'add', description: 'Add a reminder'
       on /delete reminder (?<id>.+)/, name: 'delete', description: 'Delete a reminder'
@@ -64,7 +63,7 @@ module Ruboty
       end
 
       def reminders
-        robot.brain.data[NAMESPACE] ||= {}
+        robot.brain.data[Ruboty::Reminder::NAMESPACE] ||= {}
       end
 
       def generate_id
