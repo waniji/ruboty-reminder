@@ -28,8 +28,8 @@ module Ruboty
         hour = message[:hour].to_i
         min = message[:min].to_i
 
-        unless validate_time_format(year, month, day, hour, min)
-          message.reply('Invalid time format.')
+        unless valid_time?(year, month, day, hour, min)
+          message.reply('Invalid time.')
           return
         end
 
@@ -97,7 +97,7 @@ module Ruboty
         end
       end
 
-      def validate_time_format(year, month, day, hour, min)
+      def valid_time?(year, month, day, hour, min)
         YEAR_RANGE.include?(year) &&\
           MONTH_RANGE.include?(month) &&\
           DAY_RANGE.include?(day) &&\
