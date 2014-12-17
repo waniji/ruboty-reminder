@@ -13,7 +13,7 @@ module Ruboty
         Thread.start do
           sleep(wait_time)
           Message.new(
-            hash.except(:id, :body, :hour, :min).merge(robot: robot)
+            hash.except(:id, :body, :year, :month, :day, :hour, :min, :unixtime).merge(robot: robot)
           ).reply(hash[:body])
           robot.brain.data[NAMESPACE].delete(hash[:id])
         end
