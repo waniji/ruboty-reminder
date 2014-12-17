@@ -1,8 +1,13 @@
 module Ruboty
   module Handlers
     class Reminder < Base
+      YEAR_RANGE = (2000..2100)
+      MONTH_RANGE = (1..12)
+      DAY_RANGE = (1..31)
+      HOUR_RANGE = (0..23)
+      MIN_RANGE = (0..59)
 
-      on /add reminder (?<hh>\d{2}):(?<mm>\d{2}) (?<reminder>.+)/, name: 'add', description: 'Add a reminder'
+      on /add reminder( (?<year>\d{4})\/(?<month>\d{2})\/(?<day>\d{2}))? (?<hour>\d{2}):(?<min>\d{2}) (?<reminder>.+)/, name: 'add', description: 'Add a reminder'
       on /delete reminder (?<id>.+)/, name: 'delete', description: 'Delete a reminder'
       on /list reminders\z/, name: 'list', description: 'Show all reminders'
 
@@ -12,12 +17,26 @@ module Ruboty
       end
 
       def add(message)
-        hour = message[:hh].to_i
-        min = message[:mm].to_i
+        year, month, day =
+          # [year, month, day] can be omitted.
+          if message[:year] && message[:month] && message[:day]
+            [message[:year].to_i, message[:month].to_i, message[:day].to_i]
+          else
+            now_time = Time.now
+            [now_time.year, now_time.month, now_time.day]
+          end
+        hour = message[:hour].to_i
+        min = message[:min].to_i
 
-        # Validate
-        unless hour >= 0 && hour <= 23 && min >= 0 && min <= 59
+        unless validate_time_format(year, month, day, hour, min)
           message.reply('Invalid time format.')
+          return
+        end
+
+        target_unixtime = Time.new(year, month, day, hour, min, 0).to_i
+
+        if past?(target_unixtime)
+          message.reply('Already past.')
           return
         end
 
@@ -25,14 +44,17 @@ module Ruboty
           message.original.except(:robot).merge(
             id: generate_id,
             body: message[:reminder],
+            year: year,
+            month: month,
+            day: day,
             hour: hour,
-            min: min
+            min: min,
+            unixtime: target_unixtime
           )
         )
         task.start(robot)
         message.reply("Reminder #{task.hash[:id]} is created.")
 
-        # Insert to the brain
         reminders[task.hash[:id]] = task.hash
       end
 
@@ -49,9 +71,11 @@ module Ruboty
           message.reply("The reminder doesn't exist.")
         else
           reminder_list = reminders.map do |id, hash|
-            "#{id}: #{'%02d' % hash[:hour]}:#{'%02d' % hash[:min]} -> #{hash[:body]}"
-          end.join("\n")
-          message.reply(reminder_list, code: true)
+            date = "#{hash[:year]}/#{'%02d' % hash[:month]}/#{'%02d' % hash[:day]}"
+            time = "#{'%02d' % hash[:hour]}:#{'%02d' % hash[:min]}"
+            "#{id}: #{date} #{time} -> #{hash[:body]}"
+          end
+          message.reply(reminder_list.join("\n"), code: true)
         end
       end
 
@@ -71,6 +95,18 @@ module Ruboty
           id = rand(1000)
           return id unless reminders.has_key?(id)
         end
+      end
+
+      def validate_time_format(year, month, day, hour, min)
+        YEAR_RANGE.include?(year) &&\
+          MONTH_RANGE.include?(month) &&\
+          DAY_RANGE.include?(day) &&\
+          HOUR_RANGE.include?(hour) &&\
+          MIN_RANGE.include?(min)
+      end
+
+      def past?(unixtime)
+        (unixtime - Time.now.to_i) < 0
       end
     end
   end
