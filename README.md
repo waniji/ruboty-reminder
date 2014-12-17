@@ -13,7 +13,7 @@ gem 'ruboty-reminder'
 ## Usage
 
 ```
-@ruboty add reminder HH:MM <task>
+@ruboty add reminder yyyy/MM/dd HH:mm <reminder>
 @ruboty delete reminder <id>
 @ruboty list reminders <id>
 ```
@@ -24,4 +24,7 @@ gem 'ruboty-reminder'
 > @ruboty add reminder 07:00 Hi,kaihara!
 Reminder 270 is created.
 Hi, kaihara!
+> @ruboty add reminder 2015/01/01 00:00 Happy New Year!
+Reminder 300 is created.
+Happy New Year!
 ```
