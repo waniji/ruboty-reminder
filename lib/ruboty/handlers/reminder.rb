@@ -67,11 +67,11 @@ module Ruboty
       end
 
       def list(message)
-        sorted_reminders = reminders.sort_by {|_id, hash| hash[:unixtime]}
-
         if reminders.empty?
           message.reply("The reminder doesn't exist.")
         else
+          sorted_reminders = reminders.sort_by {|_id, hash| hash[:unixtime]}
+
           reminder_list = sorted_reminders.map do |id, hash|
             date = "#{hash[:year]}/#{'%02d' % hash[:month]}/#{'%02d' % hash[:day]}"
             time = "#{'%02d' % hash[:hour]}:#{'%02d' % hash[:min]}"
