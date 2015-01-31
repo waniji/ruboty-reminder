@@ -55,11 +55,13 @@ module Ruboty
         task.start(robot)
         message.reply("Reminder #{task.hash[:id]} is created.")
 
-        reminders[task.hash[:id]] = task.hash
+        reminders[task.hash[:id]] = task
       end
 
       def delete(message)
-        if reminders.delete(message[:id].to_i)
+        if task = reminders[message[:id].to_i]
+          task.thread.kill
+          reminders.delete(message[:id].to_i)
           message.reply("Reminder #{message[:id]} is deleted.")
         else
           message.reply("Reminder #{message[:id]} is not found.")
@@ -70,21 +72,21 @@ module Ruboty
         if reminders.empty?
           message.reply("The reminder doesn't exist.")
         else
-          sorted_reminders = reminders.sort_by {|_id, hash| hash[:unixtime]}
+          sorted_reminders = reminders.sort_by {|_id, task| task.hash[:unixtime]}
 
-          reminder_list = sorted_reminders.map do |id, hash|
-            date = "#{hash[:year]}/#{'%02d' % hash[:month]}/#{'%02d' % hash[:day]}"
-            time = "#{'%02d' % hash[:hour]}:#{'%02d' % hash[:min]}"
-            "#{id}: #{date} #{time} -> #{hash[:body]}"
+          reminder_list = sorted_reminders.map do |id, task|
+            date = "#{task.hash[:year]}/#{'%02d' % task.hash[:month]}/#{'%02d' % task.hash[:day]}"
+            time = "#{'%02d' % task.hash[:hour]}:#{'%02d' % task.hash[:min]}"
+            "#{id}: #{date} #{time} -> #{task.hash[:body]}"
           end
           message.reply(reminder_list.join("\n"), code: true)
         end
       end
 
       def restart
-        reminders.each do |id, hash|
-          task = Ruboty::Reminder::Task.new(hash)
-          task.start(robot)
+        reminders.each do |id, task|
+          new_task = Ruboty::Reminder::Task.new(task.hash)
+          new_task.start(robot)
         end
       end
 
