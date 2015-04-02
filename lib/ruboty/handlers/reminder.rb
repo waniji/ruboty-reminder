@@ -55,16 +55,19 @@ module Ruboty
         task.start(robot)
         message.reply("Reminder #{task.hash[:id]} is created.")
 
-        reminders[task.hash[:id]] = task
+        reminders[task.hash[:id]] = task.hash
+        running_tasks[task.hash[:id]] = task
       end
 
       def delete(message)
-        if task = reminders[message[:id].to_i]
-          task.thread.kill
-          reminders.delete(message[:id].to_i)
-          message.reply("Reminder #{message[:id]} is deleted.")
+        id = message[:id].to_i
+        if reminders.has_key?(id)
+          running_tasks[id].thread.kill
+          running_tasks.delete(id)
+          reminders.delete(id)
+          message.reply("Reminder #{id} is deleted.")
         else
-          message.reply("Reminder #{message[:id]} is not found.")
+          message.reply("Reminder #{id} is not found.")
         end
       end
 
@@ -72,12 +75,12 @@ module Ruboty
         if reminders.empty?
           message.reply("The reminder doesn't exist.")
         else
-          sorted_reminders = reminders.sort_by {|_id, task| task.hash[:unixtime]}
+          sorted_reminders = reminders.sort_by {|_id, task| task[:unixtime]}
 
           reminder_list = sorted_reminders.map do |id, task|
-            date = "#{task.hash[:year]}/#{'%02d' % task.hash[:month]}/#{'%02d' % task.hash[:day]}"
-            time = "#{'%02d' % task.hash[:hour]}:#{'%02d' % task.hash[:min]}"
-            "#{id}: #{date} #{time} -> #{task.hash[:body]}"
+            date = "#{task[:year]}/#{'%02d' % task[:month]}/#{'%02d' % task[:day]}"
+            time = "#{'%02d' % task[:hour]}:#{'%02d' % task[:min]}"
+            "#{id}: #{date} #{time} -> #{task[:body]}"
           end
           message.reply(reminder_list.join("\n"), code: true)
         end
@@ -85,9 +88,14 @@ module Ruboty
 
       def restart
         reminders.each do |id, task|
-          new_task = Ruboty::Reminder::Task.new(task.hash)
+          new_task = Ruboty::Reminder::Task.new(task)
+          running_tasks[id] = new_task
           new_task.start(robot)
         end
+      end
+
+      def running_tasks
+        @running_tasks ||= {}
       end
 
       def reminders
